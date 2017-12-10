@@ -9,31 +9,22 @@ public class Tick : MonoBehaviour {
     public static Tick instance;
     public static OnUpdateDele OnUpdate, OnFixedUpdate;
     public static bool GamePause;
-    public static float TimeScale
-    {
-        get
-        {
-            return TimeScale;
-        }
-        set
-        {
-            TimeScale = Mathf.Min(1, value);
-        }
-    }
+    public static float TimeScale;
+    public static float deltaTime;
 
     private void Awake()
     {
         instance = this;
-        GamePause = false;
+        TimeScale = 1f;
     }
 
-    private float count = 0;
     private void Update()
     {
         if(OnUpdate != null && !GamePause)
         {
             OnUpdate();
         }
+        deltaTime = Time.deltaTime * TimeScale;
     }
 
     private void FixedUpdate()

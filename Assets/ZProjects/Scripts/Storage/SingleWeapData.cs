@@ -7,4 +7,6 @@ public class SingleWeapData : ScriptableObject
 {
     public GameObject prefab;
     public WeapType type;
+
+    public float reAttackTime = 0.2f;
 }

@@ -14,22 +14,22 @@ public class ProjectileBase : Photon.MonoBehaviour {
 
     protected virtual void ProjectileUpdate()
     {
-        transform.position += (transform.forward * translateSpeed * Time.deltaTime);
+        transform.position += (transform.forward * translateSpeed * Tick.deltaTime);
     }
 
-    IEnumerator AutoDestroy(float time)
+    protected IEnumerator AutoDestroy(float time)
     {
         yield return new WaitForSeconds(time);
         Tick.OnUpdate -= ProjectileUpdate;
         PhotonNetwork.Destroy(photonView);
     }
 
-    private void OnTriggerEnter(Collider other)
+    protected virtual void OnTriggerEnter(Collider other)
     {
         if (other.GetComponent<ProjectileBase>())
             return;
 
-        GearBase gear = other.transform.root.GetComponent<GearBase>();
+        TargetObject gear = other.transform.root.GetComponent<TargetObject>();
         if (gear != null && !photonView.isMine)
         {
             print("hited gear " + gear.name);

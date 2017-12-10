@@ -24,7 +24,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _CutAlpha: 0.176
-    - _Emission: 8
+    - _Emission: 4
     - _Glossiness: 0.5
     - _Metallic: 0
     m_Colors:

@@ -73,7 +73,7 @@ Transform:
   m_GameObject: {fileID: 1584633997225860}
   m_LocalRotation: {x: 0.5, y: 0.5, z: -0.5, w: 0.5}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 3, y: 0.4, z: 1}
+  m_LocalScale: {x: 4, y: 0.6, z: 1}
   m_Children: []
   m_Father: {fileID: 4717929389285622}
   m_RootOrder: 0
@@ -86,7 +86,7 @@ Transform:
   m_GameObject: {fileID: 1118429219600964}
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 3, y: 0.4, z: 1}
+  m_LocalScale: {x: 4, y: 0.6, z: 1}
   m_Children: []
   m_Father: {fileID: 4717929389285622}
   m_RootOrder: 1
@@ -131,7 +131,7 @@ MeshRenderer:
   m_PreserveUVs: 1
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
-  m_StitchSeams: 0
+  m_StitchLightmapSeams: 0
   m_SelectedEditorRenderState: 3
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
@@ -165,7 +165,7 @@ MeshRenderer:
   m_PreserveUVs: 1
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
-  m_StitchSeams: 0
+  m_StitchLightmapSeams: 0
   m_SelectedEditorRenderState: 3
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
@@ -302,8 +302,8 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 114319756491951646}
   ObservedComponentsFoldoutOpen: 1
-  viewIdField: 1
-  instantiationId: 1
+  viewIdField: 0
+  instantiationId: -1
   currentMasterID: -1
   isRuntimeInstantiated: 0
 --- !u!135 &135358051042539558

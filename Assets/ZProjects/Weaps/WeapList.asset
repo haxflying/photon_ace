@@ -13,3 +13,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaps:
   - {fileID: 11400000, guid: 8149c39c780354b4c80eea016af9b333, type: 2}
+  - {fileID: 11400000, guid: e581fc1ae7b14234e8e8c0db1a720e2c, type: 2}

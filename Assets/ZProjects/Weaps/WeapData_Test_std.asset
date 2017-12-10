@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04bf9e4b1116ce944b65dd0ea7f1d243, type: 3}
+  m_Name: WeapData_Test_std
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 1644502233486306, guid: 3c8b55b41dd6cbf4ab5a2d20f584a68a, type: 2}
+  type: 0
+  reAttackTime: 0.2

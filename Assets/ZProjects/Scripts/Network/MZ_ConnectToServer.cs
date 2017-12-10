@@ -50,6 +50,10 @@ public class MZ_ConnectToServer : Photon.MonoBehaviour {
     public void OnJoinedRoom()
     {
         print("Joined");
-        PhotonNetwork.Instantiate(playerPrefab.name, new Vector3(PhotonNetwork.player.ID * 2f, 2f, 0), Quaternion.identity, 0);
+        //print("cos 15 " + Mathf.Cos( 15f));
+        GameObject gobject = PhotonNetwork.Instantiate(playerPrefab.name, new Vector3(PhotonNetwork.player.ID * 2f, 2f, 0), Quaternion.identity, 0);
+        TargetObject tobject = gobject.GetComponent<TargetObject>();
+        if (tobject != null)
+            Sources.instance.targets.Add(tobject);
     }
 }
