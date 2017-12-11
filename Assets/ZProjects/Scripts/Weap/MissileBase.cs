@@ -15,6 +15,9 @@ public class MissileBase : Photon.MonoBehaviour
     {
         this.parent = parent;
         this.target = target;
+
+        //photonView.RPC("NetInit", PhotonTargets.All, parent, target);
+
         Tick.OnUpdate += MissileUpdate;
         StartCoroutine(AutoDestroy(10f));
 
@@ -34,6 +37,32 @@ public class MissileBase : Photon.MonoBehaviour
         Tick.OnUpdate -= MissileUpdate;
         if(photonView.isMine)
             PhotonNetwork.Destroy(photonView);
+    }
+
+    protected virtual void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.isWriting)
+        {
+            int index_parent = parent.photonView.viewID;
+            int index_target = target.photonView.viewID;
+            stream.Serialize(ref index_parent);
+            stream.Serialize(ref index_target);
+        }
+        else
+        {
+            int index_parent = 0;
+            int index_target = 0;
+            stream.Serialize(ref index_parent);
+            stream.Serialize(ref index_target);
+            if (index_parent != -1)
+            {
+                parent = Sources.instance.GetObject(index_parent) as GearBase;
+            }
+            if (index_target != -1)
+            {
+                target = Sources.instance.GetObject(index_target);
+            }
+        }
     }
 
     protected virtual void MissileUpdate()
@@ -59,13 +88,17 @@ public class MissileBase : Photon.MonoBehaviour
         if (gear != null)
         {
             if (gear != parent)
-                print("hited gear " + PhotonView.Get(gear.gameObject).viewID);
+            {
+                //print(parent.photonView.viewID + " hited gear ");
+                print(parent.gameObject.name + " hited gear ");
+                print(PhotonView.Get(gear.gameObject).viewID);
+            }
             else
                 return;
         }
         else if (gear == null)
         {
-            print("hited " + other.name);            
+            print("hited normal obj " + other.name);            
         }
 
         Tick.OnUpdate -= MissileUpdate;

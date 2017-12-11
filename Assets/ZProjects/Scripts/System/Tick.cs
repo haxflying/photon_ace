@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Tick : MonoBehaviour {
+public class Tick : Photon.MonoBehaviour {
 
     public delegate void OnUpdateDele();
 
@@ -11,6 +11,11 @@ public class Tick : MonoBehaviour {
     public static bool GamePause;
     public static float TimeScale;
     public static float deltaTime;
+
+    public void SlowDown()
+    {
+        TimeScale = 0.1f;
+    }
 
     private void Awake()
     {

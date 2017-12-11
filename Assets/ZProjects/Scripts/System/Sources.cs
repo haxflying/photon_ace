@@ -8,9 +8,14 @@ public class Sources : MonoBehaviour {
 
     public List<TargetObject> targets = new List<TargetObject>();
     public WeapStorage weaps;
-
     private void Awake()
     {
         instance = this;
+    }    
+    
+    public TargetObject GetObject(int viewID)
+    {
+        return targets.Find((e) => e.photonView.viewID == viewID);
     }
+
 }

@@ -14,7 +14,15 @@ public class FollowCamera : MonoBehaviour {
 
     void followUpdate()
     {
+        if(target == null)
+        {
+            Tick.OnUpdate -= followUpdate;
+            Destroy(gameObject);
+            return;
+        }
         transform.rotation = Quaternion.Lerp(transform.rotation, target.rotation, Tick.deltaTime * rotfollowSpeed);
-        transform.position = Vector3.Lerp(transform.position, target.position, Tick.deltaTime * posfollowSpeed);
+
+        
+        transform.position = Vector3.Lerp(transform.position, target.position, Tick.deltaTime * posfollowSpeed);        
     }
 }

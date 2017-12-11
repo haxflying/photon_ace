@@ -12,11 +12,12 @@ public class GearBase : TargetObject {
     public Transform camPos { get; private set; }
 
     private TextMesh nickName;
-    private Transform mesh;
+    private Transform Trans, rollTrans;
     private Camera cam;
+    private List<Material> GearMats = new List<Material>();
 
     private bool isStop;
-    private float rotThreshold = 10, rotZSpeed = 10f, horizontalSpeed = 3f;
+    private float rotZSpeed = 250f, horizontalSpeed = 3f;
     private float currentRotZ = 0f, currentHorizontalSpeed = 0f;
     protected virtual void Awake()
     {
@@ -35,9 +36,13 @@ public class GearBase : TargetObject {
         if (photonView.isMine && PhotonNetwork.isMasterClient)
             nickName.text += "(Master)";
 
+        gameObject.name = "Gear " + nickName.text;
+
         //transform init
-        mesh = transform.Find("MeshTransform");
-        camPos = mesh.Find("CamPos");
+        Trans = transform.Find("MeshTransform");
+        camPos = Trans.Find("CamPos");
+        rollTrans = Trans.Find("RollTransform");
+
         cam = GetComponentInChildren<Camera>();
         if(cam != null)
         {
@@ -48,7 +53,13 @@ public class GearBase : TargetObject {
         isStop = true;
 
         //system init
-        gameObject.AddComponent<WeapSystem>().Initilize(this, mesh);
+        gameObject.AddComponent<WeapSystem>().Initilize(this, rollTrans);
+
+        foreach(Renderer rd in GetComponentsInChildren<Renderer>())
+        {
+            GearMats.Add(rd.material);
+        }
+        gameObject.AddComponent<SkillSystem>().Initilize(this, cam, GearMats);
 
         //network init
         if (photonView.isMine)
@@ -60,6 +71,11 @@ public class GearBase : TargetObject {
             cam.gameObject.SetActive(false);
         }
 
+        //add to source
+        if(!Sources.instance.targets.Contains(this))
+        {
+            Sources.instance.targets.Add(this);
+        }
         print("gear inited");
         Inited = true;
     }
@@ -89,32 +105,47 @@ public class GearBase : TargetObject {
         }
 
         currentSpeed = Mathf.Clamp(currentSpeed, minSpeed, maxSpeed);
-        transform.position += mesh.forward * currentSpeed * Tick.deltaTime;
+        transform.position += Trans.forward * currentSpeed * Tick.deltaTime;
 
         Vector3 screenSize = new Vector3(Screen.width, Screen.height, 0);
         Vector3 mousePos = Input.mousePosition;
 
         mousePos = mousePos - screenSize / 2f;
-        mesh.Rotate(new Vector3(-mousePos.y, mousePos.x, 0) * Tick.deltaTime * rotScale);
+        Trans.Rotate(new Vector3(-mousePos.y, mousePos.x, 0) * Tick.deltaTime * rotScale);
+
+        float roll = rollTrans.localRotation.eulerAngles.z > 180 ?
+            360f - rollTrans.localRotation.eulerAngles.z : rollTrans.localRotation.eulerAngles.z;
+
 
         if (Input.GetKey(KeyCode.A))
         {
-                currentRotZ += rotZSpeed * Tick.deltaTime;
-                currentHorizontalSpeed = Mathf.Lerp(currentHorizontalSpeed, -horizontalSpeed, Tick.deltaTime);            
+            if (roll <= 80f)
+            {
+                currentRotZ = rotZSpeed * Tick.deltaTime;
+                currentHorizontalSpeed = Mathf.Lerp(currentHorizontalSpeed, -horizontalSpeed, 5f * Tick.deltaTime);
+                rollTrans.localRotation *= Quaternion.Euler(new Vector3(0, 0, currentRotZ));
+            }
         }
-        else if(Input.GetKey(KeyCode.D))
+        else if (Input.GetKey(KeyCode.D))
         {
-                currentRotZ -= rotZSpeed * Tick.deltaTime;
-                currentHorizontalSpeed = Mathf.Lerp(currentHorizontalSpeed, horizontalSpeed, Tick.deltaTime);
+            if (roll <= 80f)
+            {
+                currentRotZ = -rotZSpeed * Tick.deltaTime;
+                currentHorizontalSpeed = Mathf.Lerp(currentHorizontalSpeed, horizontalSpeed, 5f * Tick.deltaTime);
+                rollTrans.localRotation *= Quaternion.Euler(new Vector3(0, 0, currentRotZ));
+            }
         }
         else
         {
-            currentRotZ = Mathf.Lerp(currentRotZ, 0f, rotZSpeed * Tick.deltaTime);
+            rollTrans.localRotation = Quaternion.Lerp(rollTrans.localRotation, Quaternion.identity, 3f * Tick.deltaTime);
             currentHorizontalSpeed = Mathf.Lerp(currentHorizontalSpeed, 0f, Tick.deltaTime);
-        }
-        
-        currentRotZ = Mathf.Clamp(currentRotZ, -rotThreshold, rotThreshold);
-        mesh.rotation *= Quaternion.Euler(new Vector3(0, 0, currentRotZ));
-        transform.position += mesh.up * currentHorizontalSpeed * Tick.deltaTime;
+        }          
+
+        //print("roll " + roll);       
+        transform.position += Trans.right * currentHorizontalSpeed * Tick.deltaTime;
+        //print(Mathf.Abs(currentHorizontalSpeed) / horizontalSpeed);
+        //print(camPos.localPosition);
+        rollTrans.localPosition = Vector3.Lerp(new Vector3(0, 0, 0), new Vector3(currentHorizontalSpeed > 0 ? 2.5f : -2.5f, 0, 0),
+            Mathf.Abs(currentHorizontalSpeed) / horizontalSpeed);
     }
 }
