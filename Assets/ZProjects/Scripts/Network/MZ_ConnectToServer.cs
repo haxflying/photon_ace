@@ -24,6 +24,15 @@ public class MZ_ConnectToServer : Photon.MonoBehaviour {
             ConnectInUpdate = false;
             PhotonNetwork.ConnectUsingSettings(Version + "." + SceneManagerHelper.ActiveSceneBuildIndex);
         }
+
+        //test
+        if(Input.GetKeyDown(KeyCode.P))
+        {
+            foreach(PhotonPlayer player in PhotonNetwork.playerList)
+            {
+                print(player.ID + " " +  player.TagObject);
+            }
+        }
     }
 
     //callbacks
@@ -40,6 +49,11 @@ public class MZ_ConnectToServer : Photon.MonoBehaviour {
     public virtual void OnPhotonRandomJoinFailed()
     {
         PhotonNetwork.CreateRoom(null, new RoomOptions() { MaxPlayers = 4 }, null);
+        if (Sources.instance != null)
+        {
+            Sources.instance.players.Clear();
+            print("inited players source");
+        }
     }
 
     public virtual void OnFailedToConnectToPhoton(DisconnectCause cause)
@@ -51,7 +65,7 @@ public class MZ_ConnectToServer : Photon.MonoBehaviour {
     {
         print("Joined");
         //print("cos 15 " + Mathf.Cos( 15f));
-        GameObject gobject = PhotonNetwork.Instantiate(playerPrefab.name, new Vector3(PhotonNetwork.player.ID * 4f, 3f, 0), Quaternion.identity, 0);
+        GameObject gobject = PhotonNetwork.Instantiate(playerPrefab.name, new Vector3(PhotonNetwork.player.ID * 10f, 3f, 0), Quaternion.identity, 0);
         //TargetObject tobject = gobject.GetComponent<TargetObject>();
         //if (tobject != null)
         //    Sources.instance.targets.Add(tobject);
@@ -59,11 +73,19 @@ public class MZ_ConnectToServer : Photon.MonoBehaviour {
 
     public void OnPhotonPlayerConnected(PhotonPlayer player)
     {
-        print(player.ID + " added ");
+        if(Sources.instance != null)
+        {
+            Sources.instance.players.Add(player);
+            print(player.ID + " added ");
+        }       
     }
 
     public void OnPhotonPlayerDisconnected(PhotonPlayer player)
     {
-        print(player.ID + " leaved ");
+        if (Sources.instance != null)
+        {
+            Sources.instance.players.Remove(player);
+            print(player.ID + " leaved ");
+        }
     }
 }

@@ -14,7 +14,7 @@ public class BulletTimeEffect : MonoBehaviour
 	{
 		if (_scanning)
 		{
-			ScanDistance += Time.deltaTime * (10  + Mathf.Pow(ScanDistance,1.2f));           
+			ScanDistance += Time.deltaTime * (3  + Mathf.Pow(ScanDistance,1.2f));           
 		}
 
 		//if (Input.GetMouseButtonDown(0))

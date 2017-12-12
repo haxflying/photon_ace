@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
-public class SkillSystem : Photon.MonoBehaviour
+public class SkillSystem : Photon.MonoBehaviour, IPunObservable
 {
     
     GearBase parent;
@@ -28,8 +29,13 @@ public class SkillSystem : Photon.MonoBehaviour
         {
             //tmp
             bulletTimeOriginal = transform.position;
-            //ActiveBulletTime();
-            photonView.RPC("ActiveBulletTime", PhotonTargets.AllViaServer, "hello");
+            //foreach (Material mat in mats)
+            //{
+            //    mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+            //}
+            cam.GetComponent<BulletTimeEffect>().ActiveBulletTime(bulletTimeOriginal, true);
+
+            photonView.RPC("ActiveBulletTime", PhotonTargets.AllViaServer, bulletTimeOriginal);
             //Tick.instance.SlowDown();
         }
     }
@@ -50,12 +56,31 @@ public class SkillSystem : Photon.MonoBehaviour
     }
 
     [PunRPC]
-    private void ActiveBulletTime(Vector3 pos)
+    private void ActiveBulletTime(Vector3 pos, PhotonMessageInfo info)
     {
         foreach (Material mat in mats)
         {
             mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
         }
-        cam.GetComponent<BulletTimeEffect>().ActiveBulletTime(pos, true);
+        foreach (TargetObject target in Sources.instance.targets)
+        {
+            if (target.GetComponent<GearBase>() && target.photonView != parent.photonView)
+            {
+                target.GetComponent<GearBase>().Cam.GetComponent<BulletTimeEffect>().ActiveBulletTime(bulletTimeOriginal, true);
+                print(target.gameObject.name + " at " + pos + " by " + info.sender);
+            }
+        }
+
+        //foreach(PhotonPlayer player in PhotonNetwork.otherPlayers)
+        //{
+        //    GearBase gear = player.TagObject as GearBase;
+        //    gear.Cam.GetComponent<BulletTimeEffect>().ActiveBulletTime(bulletTimeOriginal, true);
+        //    print(gear.gameObject.name + " at " + pos + " by " + info.sender);
+        //}      
+    }
+
+    void IPunObservable.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        
     }
 }

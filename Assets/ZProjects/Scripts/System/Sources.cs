@@ -7,6 +7,7 @@ public class Sources : MonoBehaviour {
     public static Sources instance;
 
     public List<TargetObject> targets = new List<TargetObject>();
+    public List<PhotonPlayer> players = new List<PhotonPlayer>();
     public WeapStorage weaps;
     private void Awake()
     {

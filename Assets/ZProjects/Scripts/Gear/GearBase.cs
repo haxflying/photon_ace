@@ -10,6 +10,14 @@ public class GearBase : TargetObject {
 
 	public bool Inited { get; private set; }
     public Transform camPos { get; private set; }
+    public PhotonPlayer localPlayer { get; private set; }
+    public Camera Cam
+    {
+        get
+        {
+            return cam;
+        }
+    }
 
     private TextMesh nickName;
     private Transform Trans, rollTrans;
@@ -29,6 +37,13 @@ public class GearBase : TargetObject {
     {
         if (Inited)
             return;
+
+        //player init
+        if (photonView.isMine)
+        {
+            localPlayer = PhotonNetwork.player;
+            localPlayer.TagObject = this;
+        }
 
         //name init
         nickName = GetComponentInChildren<TextMesh>();
