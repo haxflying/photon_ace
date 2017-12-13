@@ -12,9 +12,27 @@ public class Tick : Photon.MonoBehaviour {
     public static float TimeScale;
     public static float deltaTime;
 
-    public void SlowDown()
+    public void SlowDownAllTargetExcept(PhotonPlayer target, float timeScale = 0.1f, bool includingOthersWeap = true)
     {
-        TimeScale = 0.1f;
+        foreach(TargetObjectBase t in Sources.instance.targets)
+        {
+            if(t.photonView.ownerId != target.ID)
+            {
+                t.SetTimeScale(timeScale);
+                print("Slowed " + t.gameObject.name);
+            }
+        }
+
+        if (includingOthersWeap)
+        {
+            foreach (WeapObjectBase wo in Sources.instance.weapObjects)
+            {
+                if (wo.parent.photonView.ownerId != target.ID)
+                {
+                    wo.SetTimeScale(timeScale);
+                }
+            }
+        }
     }
 
     private void Awake()

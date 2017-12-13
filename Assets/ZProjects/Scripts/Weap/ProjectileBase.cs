@@ -1,20 +1,23 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ProjectileBase : Photon.MonoBehaviour {
+public class ProjectileBase : WeapObjectBase {
 
     public float translateSpeed = 30f;
 
-    protected virtual void Awake()
+    public override void Initilize(GearBase parent, TargetObjectBase target, float deltaTime, float timeScale = 1f)
     {
+        base.Initilize(parent, target, deltaTime, timeScale);
+
         StartCoroutine(AutoDestroy(10f));
         Tick.OnUpdate += ProjectileUpdate;
     }
 
     protected virtual void ProjectileUpdate()
     {
-        transform.position += (transform.forward * translateSpeed * Tick.deltaTime);
+        transform.position += (transform.forward * translateSpeed * deltaTime);
     }
 
     protected IEnumerator AutoDestroy(float time)
@@ -29,7 +32,7 @@ public class ProjectileBase : Photon.MonoBehaviour {
         if (other.GetComponent<ProjectileBase>())
             return;
 
-        TargetObject gear = other.transform.root.GetComponent<TargetObject>();
+        TargetObjectBase gear = other.transform.root.GetComponent<TargetObjectBase>();
         if (gear != null && !photonView.isMine)
         {
             print("hited gear " + gear.name);
@@ -42,4 +45,5 @@ public class ProjectileBase : Photon.MonoBehaviour {
             StartCoroutine(AutoDestroy(1f));
         }
     }
+
 }

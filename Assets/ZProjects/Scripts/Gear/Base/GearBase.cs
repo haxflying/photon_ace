@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GearBase : TargetObject {
+public class GearBase : TargetObjectBase {
 
 
     public float minSpeed = 0, maxSpeed = 30f, acclerate = 10f, rotScale = 1f;
     protected float currentSpeed;
+
+    protected LockSystem lockSystem;
+    protected SkillSystem skillSystem;
+    protected WeapSystem weapSystem;
 
 	public bool Inited { get; private set; }
     public Transform camPos { get; private set; }
@@ -23,12 +27,14 @@ public class GearBase : TargetObject {
     private Transform Trans, rollTrans;
     private Camera cam;
     private List<Material> GearMats = new List<Material>();
+    
 
     private bool isStop;
     private float rotZSpeed = 250f, horizontalSpeed = 3f;
     private float currentRotZ = 0f, currentHorizontalSpeed = 0f;
-    protected virtual void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         Inited = false;
         Initilize();
     }
@@ -53,6 +59,8 @@ public class GearBase : TargetObject {
 
         gameObject.name = "Gear " + nickName.text;
 
+        //print(photonView.ownerId + " " + localPlayer.ID);
+
         //transform init
         Trans = transform.Find("MeshTransform");
         camPos = Trans.Find("CamPos");
@@ -63,18 +71,20 @@ public class GearBase : TargetObject {
         {
             cam.gameObject.name = "Cam:" + nickName.text;
             cam.transform.SetParent(null);
-            cam.gameObject.AddComponent<FollowCamera>().Initilize(camPos);
+            cam.gameObject.AddComponent<FollowCamera>().Initilize(camPos, deltaTime);
         }
         isStop = true;
 
         //system init
-        gameObject.AddComponent<WeapSystem>().Initilize(this, rollTrans);
+        weapSystem = gameObject.AddComponent<WeapSystem>();
+        weapSystem.Initilize(this, rollTrans, deltaTime);
 
-        foreach(Renderer rd in GetComponentsInChildren<Renderer>())
+        foreach (Renderer rd in GetComponentsInChildren<Renderer>())
         {
             GearMats.Add(rd.material);
         }
-        gameObject.AddComponent<SkillSystem>().Initilize(this, cam, GearMats);
+        skillSystem = gameObject.AddComponent<SkillSystem>();
+        skillSystem.Initilize(this, cam, GearMats);
 
         //network init
         if (photonView.isMine)
@@ -95,6 +105,13 @@ public class GearBase : TargetObject {
         Inited = true;
     }
 
+    public override void SetTimeScale(float timeScale)
+    {
+        base.SetTimeScale(timeScale);
+        //Bullet time just effects weap system now
+        weapSystem.SetTimeScale(timeScale);
+    }
+
     public virtual void MovementUpdate()
     {
         if(Input.GetKeyDown(KeyCode.B))
@@ -107,26 +124,26 @@ public class GearBase : TargetObject {
 
         if(Input.GetKey(KeyCode.Space))
         {
-            currentSpeed += acclerate * Tick.deltaTime;
+            currentSpeed += acclerate * deltaTime;
         }
         else
         {
-            currentSpeed -= acclerate * Tick.deltaTime * 0.3f;
+            currentSpeed -= acclerate * deltaTime * 0.3f;
         }
 
         if (Input.GetKey(KeyCode.S))
         {
-            currentSpeed -= acclerate * Tick.deltaTime;
+            currentSpeed -= acclerate * deltaTime;
         }
 
         currentSpeed = Mathf.Clamp(currentSpeed, minSpeed, maxSpeed);
-        transform.position += Trans.forward * currentSpeed * Tick.deltaTime;
+        transform.position += Trans.forward * currentSpeed * deltaTime;
 
         Vector3 screenSize = new Vector3(Screen.width, Screen.height, 0);
         Vector3 mousePos = Input.mousePosition;
 
         mousePos = mousePos - screenSize / 2f;
-        Trans.Rotate(new Vector3(-mousePos.y, mousePos.x, 0) * Tick.deltaTime * rotScale);
+        Trans.Rotate(new Vector3(-mousePos.y, mousePos.x, 0) * deltaTime * rotScale);
 
         float roll = rollTrans.localRotation.eulerAngles.z > 180 ?
             360f - rollTrans.localRotation.eulerAngles.z : rollTrans.localRotation.eulerAngles.z;
@@ -136,8 +153,8 @@ public class GearBase : TargetObject {
         {
             if (roll <= 80f)
             {
-                currentRotZ = rotZSpeed * Tick.deltaTime;
-                currentHorizontalSpeed = Mathf.Lerp(currentHorizontalSpeed, -horizontalSpeed, 5f * Tick.deltaTime);
+                currentRotZ = rotZSpeed * deltaTime;
+                currentHorizontalSpeed = Mathf.Lerp(currentHorizontalSpeed, -horizontalSpeed, 5f * deltaTime);
                 rollTrans.localRotation *= Quaternion.Euler(new Vector3(0, 0, currentRotZ));
             }
         }
@@ -145,19 +162,19 @@ public class GearBase : TargetObject {
         {
             if (roll <= 80f)
             {
-                currentRotZ = -rotZSpeed * Tick.deltaTime;
-                currentHorizontalSpeed = Mathf.Lerp(currentHorizontalSpeed, horizontalSpeed, 5f * Tick.deltaTime);
+                currentRotZ = -rotZSpeed * deltaTime;
+                currentHorizontalSpeed = Mathf.Lerp(currentHorizontalSpeed, horizontalSpeed, 5f * deltaTime);
                 rollTrans.localRotation *= Quaternion.Euler(new Vector3(0, 0, currentRotZ));
             }
         }
         else
         {
-            rollTrans.localRotation = Quaternion.Lerp(rollTrans.localRotation, Quaternion.identity, 3f * Tick.deltaTime);
-            currentHorizontalSpeed = Mathf.Lerp(currentHorizontalSpeed, 0f, Tick.deltaTime);
+            rollTrans.localRotation = Quaternion.Lerp(rollTrans.localRotation, Quaternion.identity, 3f * deltaTime);
+            currentHorizontalSpeed = Mathf.Lerp(currentHorizontalSpeed, 0f, deltaTime);
         }          
 
         //print("roll " + roll);       
-        transform.position += Trans.right * currentHorizontalSpeed * Tick.deltaTime;
+        transform.position += Trans.right * currentHorizontalSpeed * deltaTime;
         //print(Mathf.Abs(currentHorizontalSpeed) / horizontalSpeed);
         //print(camPos.localPosition);
         rollTrans.localPosition = Vector3.Lerp(new Vector3(0, 0, 0), new Vector3(currentHorizontalSpeed > 0 ? 2.5f : -2.5f, 0, 0),

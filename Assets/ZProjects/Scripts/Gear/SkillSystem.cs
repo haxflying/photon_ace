@@ -3,16 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-public class SkillSystem : Photon.MonoBehaviour, IPunObservable
-{
-    
-    GearBase parent;
+public class SkillSystem : GearSystemBase, IPunObservable
+{    
     Camera cam;
     List<Material> mats;
     Vector3 bulletTimeOriginal;
-    public virtual void Initilize(GearBase parent, Camera cam, List<Material> mats)
+
+    public override void Initilize(GearBase parent, Camera cam, List<Material> mats)
     {
-        this.parent = parent;
+        base.Initilize(parent, cam, mats);
         this.cam = cam;
         this.mats = mats;
         parent.photonView.ObservedComponents.Add(this);
@@ -25,14 +24,10 @@ public class SkillSystem : Photon.MonoBehaviour, IPunObservable
         if (!photonView.isMine)
             return;
 
-        if (Input.GetKeyDown(KeyCode.C))
+        if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             //tmp
             bulletTimeOriginal = transform.position;
-            //foreach (Material mat in mats)
-            //{
-            //    mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
-            //}
             cam.GetComponent<BulletTimeEffect>().ActiveBulletTime(bulletTimeOriginal, true);
 
             photonView.RPC("ActiveBulletTime", PhotonTargets.AllViaServer, bulletTimeOriginal);
@@ -62,25 +57,20 @@ public class SkillSystem : Photon.MonoBehaviour, IPunObservable
         {
             mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
         }
-        foreach (TargetObject target in Sources.instance.targets)
+        foreach (TargetObjectBase target in Sources.instance.targets)
         {
             if (target.GetComponent<GearBase>() && target.photonView != parent.photonView)
             {
                 target.GetComponent<GearBase>().Cam.GetComponent<BulletTimeEffect>().ActiveBulletTime(bulletTimeOriginal, true);
-                print(target.gameObject.name + " at " + pos + " by " + info.sender);
+                Tick.instance.SlowDownAllTargetExcept(info.sender);
+                print(target.photonView.viewID + " at " + pos + " by " + info.sender);
             }
-        }
-
-        //foreach(PhotonPlayer player in PhotonNetwork.otherPlayers)
-        //{
-        //    GearBase gear = player.TagObject as GearBase;
-        //    gear.Cam.GetComponent<BulletTimeEffect>().ActiveBulletTime(bulletTimeOriginal, true);
-        //    print(gear.gameObject.name + " at " + pos + " by " + info.sender);
-        //}      
+        }            
     }
 
     void IPunObservable.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         
     }
+
 }

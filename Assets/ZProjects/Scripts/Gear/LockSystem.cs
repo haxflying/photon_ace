@@ -1,19 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
-public class LockSystem : Photon.MonoBehaviour
+public class LockSystem : GearSystemBase, IPunObservable
 {
-    public TargetObject currentTarget { get; private set; }
+    public TargetObjectBase currentTarget { get; private set; }
 
     bool locked;
     Transform mesh;
-
-    public void Initlize(Transform mesh)
-    {
-        locked = false;
-        this.mesh = mesh;
-        Tick.OnUpdate += LockUpdate;
-    }
 
     protected void LockUpdate()
     {
@@ -31,12 +25,17 @@ public class LockSystem : Photon.MonoBehaviour
         }
         else
         {
-            foreach (TargetObject target in Sources.instance.targets)
+            foreach (TargetObjectBase target in Sources.instance.targets)
             {
                 //print("scaning " + target.name);
-                if (target == this.GetComponent<TargetObject>())
+                if (target == this.GetComponent<TargetObjectBase>())
                     continue;
-
+                else if(target == null)
+                {
+                    locked = false;
+                    currentTarget = null;
+                    continue;
+                }
                 Vector3 target2me = target.transform.position - transform.position;
                 target2me = Vector3.Normalize(target2me);
                 //print(target.name + "'s cos value is " + Vector3.Dot(target2me, mesh.forward));
@@ -52,5 +51,23 @@ public class LockSystem : Photon.MonoBehaviour
                 }
             }
         }
+    }
+
+    public override void SetTimeScale(float timeScale)
+    {
+        this.timeScale = timeScale;
+    }
+
+    public override void Initilize(GearBase parent, Transform mesh, float deltaTime, float timeScale = 1)
+    {
+        base.Initilize(parent, mesh, deltaTime, timeScale);
+        locked = false;
+        this.mesh = mesh;
+        Tick.OnUpdate += LockUpdate;
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        
     }
 }

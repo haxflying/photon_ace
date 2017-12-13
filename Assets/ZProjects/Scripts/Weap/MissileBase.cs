@@ -1,22 +1,18 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
-public class MissileBase : Photon.MonoBehaviour
+public class MissileBase : WeapObjectBase
 {
     //test
     public GameObject meshMine, meshOther, psMine, psOther;
 
 
     public float translateSpeed = 50f, rotScale = 2f;
-    GearBase parent;
-    TargetObject target;
 
-    public virtual void Initilize(GearBase parent, TargetObject target)
+    public override void Initilize(GearBase parent, TargetObjectBase target, float deltaTime, float timeScale = 1f)
     {
-        this.parent = parent;
-        this.target = target;
-
-        //photonView.RPC("NetInit", PhotonTargets.All, parent, target);
+        base.Initilize(parent, target, deltaTime, timeScale);
 
         Tick.OnUpdate += MissileUpdate;
         StartCoroutine(AutoDestroy(10f));
@@ -69,13 +65,13 @@ public class MissileBase : Photon.MonoBehaviour
     {
         if (target == null)
         {
-            transform.position += (transform.forward * translateSpeed * Tick.deltaTime);
+            transform.position += (transform.forward * translateSpeed * deltaTime);
         }
         else
         {
-            transform.position += transform.forward * translateSpeed * Tick.deltaTime;
+            transform.position += transform.forward * translateSpeed * deltaTime;
             Quaternion lookRot = Quaternion.LookRotation(target.transform.position - transform.position);
-            transform.rotation = Quaternion.Lerp(transform.rotation, lookRot, rotScale * Tick.deltaTime);
+            transform.rotation = Quaternion.Lerp(transform.rotation, lookRot, rotScale * deltaTime);
         }
     }
 
@@ -84,7 +80,7 @@ public class MissileBase : Photon.MonoBehaviour
         if (other.GetComponent<MissileBase>())
             return;
 
-        TargetObject gear = other.transform.root.GetComponent<TargetObject>();
+        TargetObjectBase gear = other.transform.root.GetComponent<TargetObjectBase>();
         if (gear != null)
         {
             if (gear != parent)

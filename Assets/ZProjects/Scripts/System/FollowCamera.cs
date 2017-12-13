@@ -6,9 +6,12 @@ public class FollowCamera : MonoBehaviour {
 
     public float rotfollowSpeed = 15, posfollowSpeed = 8f;
     private Transform target;
-	public void Initilize(Transform target)
+    private float camDeltaTime, camTimeScale;
+	public void Initilize(Transform target, float deltaTime, float timeScale = 1f)
     {
         this.target = target;
+        this.camTimeScale = timeScale;
+        this.camDeltaTime = deltaTime * timeScale;        
         Tick.OnUpdate += followUpdate;
     }
 
@@ -20,9 +23,9 @@ public class FollowCamera : MonoBehaviour {
             Destroy(gameObject);
             return;
         }
-        transform.rotation = Quaternion.Lerp(transform.rotation, target.rotation, Tick.deltaTime * rotfollowSpeed);
+        transform.rotation = Quaternion.Lerp(transform.rotation, target.rotation, camDeltaTime * rotfollowSpeed);
 
         
-        transform.position = Vector3.Lerp(transform.position, target.position, Tick.deltaTime * posfollowSpeed);        
+        transform.position = Vector3.Lerp(transform.position, target.position, camDeltaTime * posfollowSpeed);        
     }
 }

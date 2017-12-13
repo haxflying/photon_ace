@@ -33,6 +33,7 @@ public class BulletTimeEffect : MonoBehaviour
 
     public void ActiveBulletTime(Vector3 position, bool active = true)
     {
+        print("bullet Time effect");
         _scanning = true;
         ScanDistance = 0;
         ScannerOrigin = position;

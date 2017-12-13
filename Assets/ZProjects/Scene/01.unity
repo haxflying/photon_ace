@@ -228,6 +228,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49710e18c2af2aa4c927f9be9fd082e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  timeScale: 0
   MaxHealth: 100
 --- !u!23 &420422987
 MeshRenderer:
@@ -489,7 +490,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targets:
   - {fileID: 420422986}
-  weaps: {fileID: 11400000, guid: 479f399c5a218e341b9769e3923e9ae4, type: 2}
+  weapObjects: []
+  weapsDatas: {fileID: 11400000, guid: 479f399c5a218e341b9769e3923e9ae4, type: 2}
 --- !u!114 &505422000
 MonoBehaviour:
   m_ObjectHideFlags: 0
