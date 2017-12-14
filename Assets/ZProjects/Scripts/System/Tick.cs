@@ -46,7 +46,7 @@ public class Tick : Photon.MonoBehaviour {
     }
 
 
-    private float? A_clicktime_0 = null, D_clicktime_0 = null;
+    private float A_clicktime_0 = -1f, D_clicktime_0 = -1f;
     private void Update()
     {
         if(OnUpdate != null && !GamePause)
@@ -56,39 +56,41 @@ public class Tick : Photon.MonoBehaviour {
         deltaTime = Time.deltaTime * TimeScale;
 
         //input event
+        if(Input.GetKeyUp(KeyCode.A))
+        {
+            A_clicktime_0 = Time.timeSinceLevelLoad;
+        }
+
+
         if(Input.GetKeyDown(KeyCode.A))
         {
-            if(A_clicktime_0 == null)
-            {
-                A_clicktime_0 = Time.timeSinceLevelLoad;
-            }
-            else
-            {
-                if(Time.timeSinceLevelLoad - A_clicktime_0 < 0.3f)
+                if (Time.timeSinceLevelLoad - A_clicktime_0 < 0.3f)
                 {
                     if (OnDoubleClickA != null)
+                    {
+                        print("AA");
                         OnDoubleClickA();
+                    }
                 }
-                A_clicktime_0 = null;
-                
-            }
+                A_clicktime_0 = -1f;
         }
+
+        if(Input.GetKeyUp(KeyCode.D))
+        {
+            D_clicktime_0 = Time.timeSinceLevelLoad;
+        }
+
         if (Input.GetKeyDown(KeyCode.D))
         {
-            if (D_clicktime_0 == null)
+            if (Time.timeSinceLevelLoad - D_clicktime_0 < 0.3f)
             {
-                D_clicktime_0 = Time.timeSinceLevelLoad;
-            }
-            else
-            {
-                if (Time.timeSinceLevelLoad - D_clicktime_0 < 0.3f)
+                if (OnDoubleClickD != null)
                 {
-                    if (OnDoubleClickD != null)
-                        OnDoubleClickD();
+                    print("DD");
+                    OnDoubleClickD();
                 }
-                D_clicktime_0 = null;
-                
             }
+            D_clicktime_0 = -1f;              
         }
     }
 

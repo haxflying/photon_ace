@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using DG.Tweening;
 public static class Extension 
 {
 
@@ -41,5 +41,14 @@ public static class Extension
             }
         }
         return child;
+    }
+
+    public static T SetDelay<T>(this T original, float time, System.Action callback, string ID = "")
+    {
+        GameObject go = new GameObject();
+        go.hideFlags = HideFlags.HideAndDontSave;
+        go.transform.position = Vector3.zero;
+        go.transform.DOMoveX(1, time).OnComplete(new TweenCallback(callback));
+        return original;
     }
 }
