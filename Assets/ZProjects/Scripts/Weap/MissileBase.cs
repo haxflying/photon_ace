@@ -10,9 +10,9 @@ public class MissileBase : WeapObjectBase
 
     public float translateSpeed = 50f, rotScale = 2f;
 
-    public override void Initilize(GearBase parent, TargetObjectBase target, float deltaTime, float timeScale = 1f)
+    public override void Initilize(GearBase parent, TargetObjectBase target)
     {
-        base.Initilize(parent, target, deltaTime, timeScale);
+        base.Initilize(parent, target);
 
         Tick.OnUpdate += MissileUpdate;
         StartCoroutine(AutoDestroy(10f));
@@ -86,8 +86,7 @@ public class MissileBase : WeapObjectBase
             if (gear != parent)
             {
                 //print(parent.photonView.viewID + " hited gear ");
-                print(parent.gameObject.name + " hited gear ");
-                print(PhotonView.Get(gear.gameObject).viewID);
+                print(parent.gameObject.name + " hited gear " + PhotonView.Get(gear.gameObject).viewID);
             }
             else
                 return;

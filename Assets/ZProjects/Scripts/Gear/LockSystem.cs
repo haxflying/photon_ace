@@ -58,9 +58,9 @@ public class LockSystem : GearSystemBase, IPunObservable
         this.timeScale = timeScale;
     }
 
-    public override void Initilize(GearBase parent, Transform mesh, float deltaTime, float timeScale = 1)
+    public override void Initilize(GearBase parent, Transform mesh)
     {
-        base.Initilize(parent, mesh, deltaTime, timeScale);
+        base.Initilize(parent, mesh);
         locked = false;
         this.mesh = mesh;
         Tick.OnUpdate += LockUpdate;

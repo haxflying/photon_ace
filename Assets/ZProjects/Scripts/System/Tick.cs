@@ -12,6 +12,10 @@ public class Tick : Photon.MonoBehaviour {
     public static float TimeScale;
     public static float deltaTime;
 
+    //input events
+    public delegate void OnKeyboardEvent();
+    public event OnKeyboardEvent OnDoubleClickA, OnDoubleClickD;
+
     public void SlowDownAllTargetExcept(PhotonPlayer target, float timeScale = 0.1f, bool includingOthersWeap = true)
     {
         foreach(TargetObjectBase t in Sources.instance.targets)
@@ -41,6 +45,8 @@ public class Tick : Photon.MonoBehaviour {
         TimeScale = 1f;
     }
 
+
+    private float? A_clicktime_0 = null, D_clicktime_0 = null;
     private void Update()
     {
         if(OnUpdate != null && !GamePause)
@@ -48,6 +54,42 @@ public class Tick : Photon.MonoBehaviour {
             OnUpdate();
         }
         deltaTime = Time.deltaTime * TimeScale;
+
+        //input event
+        if(Input.GetKeyDown(KeyCode.A))
+        {
+            if(A_clicktime_0 == null)
+            {
+                A_clicktime_0 = Time.timeSinceLevelLoad;
+            }
+            else
+            {
+                if(Time.timeSinceLevelLoad - A_clicktime_0 < 0.3f)
+                {
+                    if (OnDoubleClickA != null)
+                        OnDoubleClickA();
+                }
+                A_clicktime_0 = null;
+                
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            if (D_clicktime_0 == null)
+            {
+                D_clicktime_0 = Time.timeSinceLevelLoad;
+            }
+            else
+            {
+                if (Time.timeSinceLevelLoad - D_clicktime_0 < 0.3f)
+                {
+                    if (OnDoubleClickD != null)
+                        OnDoubleClickD();
+                }
+                D_clicktime_0 = null;
+                
+            }
+        }
     }
 
     private void FixedUpdate()

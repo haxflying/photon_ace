@@ -5,9 +5,9 @@ using UnityEngine;
 public class Sources : MonoBehaviour {
 
     public static Sources instance;
-
-    public List<TargetObjectBase> targets = new List<TargetObjectBase>();
     public List<PhotonPlayer> players = new List<PhotonPlayer>();
+
+    public List<TargetObjectBase> targets = new List<TargetObjectBase>();   
     public List<WeapObjectBase> weapObjects = new List<WeapObjectBase>();
     public WeapStorage weapsDatas;
     private void Awake()

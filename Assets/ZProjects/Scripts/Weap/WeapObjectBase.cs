@@ -8,17 +8,27 @@ public class WeapObjectBase : Photon.MonoBehaviour, IDeltaTime
     public TargetObjectBase target { get; protected set; }
 
     protected float deltaTime, timeScale;
+
+    protected virtual void Awake()
+    {
+        timeScale = 1f;
+        deltaTime = Tick.deltaTime;
+    }
+
     public virtual void SetTimeScale(float timeScale)
     {
         this.timeScale = timeScale;
         deltaTime *= timeScale;
     }
 
-    public virtual void Initilize(GearBase parent, TargetObjectBase target, float deltaTime, float timeScale = 1f)
+    public virtual void Initilize(GearBase parent, TargetObjectBase target)
     {
         this.parent = parent;
         this.target = target;
-        this.timeScale = timeScale;
-        this.deltaTime = timeScale * deltaTime;
+    }
+
+    protected virtual void Update()
+    {
+        deltaTime = Tick.deltaTime;
     }
 }

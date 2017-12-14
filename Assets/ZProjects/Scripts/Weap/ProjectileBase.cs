@@ -7,9 +7,9 @@ public class ProjectileBase : WeapObjectBase {
 
     public float translateSpeed = 30f;
 
-    public override void Initilize(GearBase parent, TargetObjectBase target, float deltaTime, float timeScale = 1f)
+    public override void Initilize(GearBase parent, TargetObjectBase target)
     {
-        base.Initilize(parent, target, deltaTime, timeScale);
+        base.Initilize(parent, target);
 
         StartCoroutine(AutoDestroy(10f));
         Tick.OnUpdate += ProjectileUpdate;

@@ -30,7 +30,7 @@ public class WeapSystem : GearSystemBase
                 {
                     ProjectileBase proj = NetworkTools.ZInstantiate<ProjectileBase>(weap.prefab.name, std_trans.position, std_trans.rotation, 0)
                         .GetComponent<ProjectileBase>();
-                    proj.Initilize(parent, null, deltaTime);
+                    proj.Initilize(parent, null);
                     stdColdDownTime = currentTime + weap.reAttackTime;
                 }
             }
@@ -51,8 +51,8 @@ public class WeapSystem : GearSystemBase
                     MissileBase missile_l = NetworkTools.ZInstantiate<MissileBase>(weap.prefab.name, adv_trans_left.position, adv_trans_left.rotation, 0).GetComponent<MissileBase>();
                     MissileBase missile_r = NetworkTools.ZInstantiate<MissileBase>(weap.prefab.name, adv_trans_right.position, adv_trans_right.rotation, 0).GetComponent<MissileBase>();
 
-                    missile_l.Initilize(parent, lockSystem.currentTarget, deltaTime);
-                    missile_r.Initilize(parent, lockSystem.currentTarget, deltaTime);
+                    missile_l.Initilize(parent, lockSystem.currentTarget);
+                    missile_r.Initilize(parent, lockSystem.currentTarget);
 
                     advColdDownTime = currentTime + weap.reAttackTime;
                 }
@@ -64,9 +64,9 @@ public class WeapSystem : GearSystemBase
         }
     }
 
-    public override void Initilize(GearBase parent, Transform mesh, float deltaTime, float timeScale = 1)
+    public override void Initilize(GearBase parent, Transform mesh)
     {
-        base.Initilize(parent, mesh, deltaTime, timeScale);
+        base.Initilize(parent, mesh);
         this.mesh = mesh;
         std_trans = transform.ZFindChild("Std_Trans");
         adv_trans_left = transform.ZFindChild("Adv_left");
@@ -76,7 +76,7 @@ public class WeapSystem : GearSystemBase
 
         //init locksystem
         lockSystem = gameObject.AddComponent<LockSystem>();
-        lockSystem.Initilize(parent, mesh, deltaTime);
+        lockSystem.Initilize(parent, mesh);
         
     }
 
