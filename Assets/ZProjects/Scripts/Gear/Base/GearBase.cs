@@ -28,6 +28,7 @@ public class GearBase : TargetObjectBase {
     private Camera cam;
     private List<Material> GearMats = new List<Material>();
     private List<Material> FlameMats = new List<Material>();
+    private Transform wing_left, wing_right;
 
     private bool isStop, isRolling;
     /*roll speed and move speed when single click A or D*/
@@ -82,6 +83,10 @@ public class GearBase : TargetObjectBase {
         {
             Debug.LogError("Can't find flame Transform");
         }
+
+        //tmp version
+        wing_left = transform.ZFindChild("Wing_left");
+        wing_right = transform.ZFindChild("Wing_right");
 
         cam = GetComponentInChildren<Camera>();
         if(cam != null)
@@ -140,7 +145,7 @@ public class GearBase : TargetObjectBase {
         {
             isStop = !isStop;
             if (isStop)
-                SetFlameLengthBySpeed(minSpeed);
+                MeshActionBySpeed(minSpeed);
         }
 
         if (isStop)
@@ -149,18 +154,18 @@ public class GearBase : TargetObjectBase {
         if(Input.GetKey(KeyCode.Space))
         {
             currentSpeed += acclerate * deltaTime;
-            SetFlameLengthBySpeed(maxSpeed);
+            MeshActionBySpeed(maxSpeed);
         }
         else
         {
             currentSpeed -= acclerate * deltaTime * 0.3f;
-            SetFlameLengthBySpeed(currentSpeed / 2f);
+            MeshActionBySpeed(currentSpeed / 2f);
         }
 
         if (Input.GetKey(KeyCode.S))
         {
             currentSpeed -= acclerate * deltaTime;
-            SetFlameLengthBySpeed(minSpeed);
+            MeshActionBySpeed(minSpeed);
         }
 
         currentSpeed = Mathf.Clamp(currentSpeed, minSpeed, maxSpeed);
@@ -249,12 +254,15 @@ public class GearBase : TargetObjectBase {
         }
     }
 
-    void SetFlameLengthBySpeed(float speed)
+    void MeshActionBySpeed(float speed)
     {
         float length = (speed - minSpeed) / (maxSpeed - minSpeed);
         foreach(Material mat in FlameMats)
         {
             mat.SetFloat("_Speed", length);
         }
+
+        wing_left.DOLocalRotate(Vector3.up * 20f * (1 - length), 0.2f);
+        wing_right.DOLocalRotate(Vector3.up * -20f * (1 - length), 0.2f);
     }
 }
