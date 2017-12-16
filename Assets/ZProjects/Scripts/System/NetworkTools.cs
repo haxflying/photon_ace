@@ -13,7 +13,9 @@ public class NetworkTools
     public static void ZDestroy<T>(GameObject go) where T : WeapObjectBase
     {
         if (Sources.instance.weapObjects.Contains(go.GetComponent<T>()))
+        {
             Sources.instance.weapObjects.Remove(go.GetComponent<T>());
+        }
         PhotonNetwork.Destroy(go);
     }
 }
