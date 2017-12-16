@@ -6,6 +6,7 @@
 		_EmissionColor("EmissionColor",Color) = (0,0,0,0)
 		_Emission("Emission",Range(0,10)) = 0
 		_Frequency("State Frequency",Range(1,100)) = 10
+		_Speed("Speed Range",Range(0,1)) = 0.1
 	}
 	SubShader {
 		Tags { "RenderType"="Transparent" "Queue" = "Transparent"}
@@ -25,7 +26,7 @@
 			float2 uv_MainTex;
 		};
 
-		half _Emission, _Frequency;
+		half _Emission, _Frequency, _Speed;
 		fixed4 _Color, _EmissionColor;
 
 		half4 Lightingflame(SurfaceOutput s, half3 lightDir, half atten) {	
@@ -44,14 +45,14 @@
 
 		void surf (Input IN, inout SurfaceOutput o) {
 			// Albedo comes from a texture tinted by color
-			IN.uv_MainTex.x *= 1;
+			IN.uv_MainTex.x *= 1/(_Speed + 0.1);
 
 			fixed4 c0 = tex2D (_MainTex, IN.uv_MainTex) * _Color;
 			fixed4 c1 = tex2D (_SubTex, IN.uv_MainTex) * _Color;
 			fixed4 c = lerp(c0,c1,abs(sin(_Time.y * _Frequency)));
 			o.Albedo = c.rgb;
 			o.Alpha = IN.uv_MainTex.x > 0.99? 0 : c.a;
-			o.Emission = _EmissionColor.rgb * _Emission;
+			o.Emission = _EmissionColor.rgb * _Emission * (1 + _Speed/10.0);
 		}
 		ENDCG
 	}

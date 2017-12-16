@@ -51,4 +51,5 @@ public static class Extension
         go.transform.DOMoveX(1, time).OnComplete(new TweenCallback(callback));
         return original;
     }
+
 }

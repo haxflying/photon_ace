@@ -5,7 +5,7 @@ using DG.Tweening;
 public class GearBase : TargetObjectBase {
 
 
-    public float minSpeed = 0, maxSpeed = 30f, acclerate = 10f, rotScale = 1f;
+    public float minSpeed = 0, maxSpeed = 30f, acclerate = 30f, rotScale = 1f;
     protected float currentSpeed;
 
     protected LockSystem lockSystem;
@@ -27,7 +27,8 @@ public class GearBase : TargetObjectBase {
     private Transform Trans, rollTrans;
     private Camera cam;
     private List<Material> GearMats = new List<Material>();
-    
+    private List<Material> FlameMats = new List<Material>();
+    private Transform wing_left, wing_right;
 
     private bool isStop, isRolling;
     /*roll speed and move speed when single click A or D*/
@@ -69,6 +70,23 @@ public class GearBase : TargetObjectBase {
         Trans = transform.Find("MeshTransform");
         camPos = Trans.Find("CamPos");
         rollTrans = Trans.Find("RollTransform");
+        Transform flameTrans = transform.ZFindChild("MeshFlame");
+        if(flameTrans != null)
+        {
+            FlameMats.Clear();
+            foreach(Renderer rd in flameTrans.GetComponentsInChildren<Renderer>())
+            {
+                FlameMats.Add(rd.material);
+            }
+        }
+        else
+        {
+            Debug.LogError("Can't find flame Transform");
+        }
+
+        //tmp version
+        wing_left = transform.ZFindChild("Wing_left");
+        wing_right = transform.ZFindChild("Wing_right");
 
         cam = GetComponentInChildren<Camera>();
         if(cam != null)
@@ -83,7 +101,7 @@ public class GearBase : TargetObjectBase {
         //system init
         weapSystem = gameObject.AddComponent<WeapSystem>();
         weapSystem.Initilize(this, rollTrans);
-
+        GearMats.Clear();
         foreach (Renderer rd in GetComponentsInChildren<Renderer>())
         {
             GearMats.Add(rd.material);
@@ -126,6 +144,8 @@ public class GearBase : TargetObjectBase {
         if(Input.GetKeyDown(KeyCode.B))
         {
             isStop = !isStop;
+            if (isStop)
+                MeshActionBySpeed(minSpeed);
         }
 
         if (isStop)
@@ -134,15 +154,18 @@ public class GearBase : TargetObjectBase {
         if(Input.GetKey(KeyCode.Space))
         {
             currentSpeed += acclerate * deltaTime;
+            MeshActionBySpeed(maxSpeed);
         }
         else
         {
             currentSpeed -= acclerate * deltaTime * 0.3f;
+            MeshActionBySpeed(currentSpeed / 2f);
         }
 
         if (Input.GetKey(KeyCode.S))
         {
             currentSpeed -= acclerate * deltaTime;
+            MeshActionBySpeed(minSpeed);
         }
 
         currentSpeed = Mathf.Clamp(currentSpeed, minSpeed, maxSpeed);
@@ -196,6 +219,8 @@ public class GearBase : TargetObjectBase {
 
     protected virtual void DoubleClickAEvent()
     {
+        if (isRolling)
+            return;
         print("double click A " + Time.time);
         isRolling = true;
         isLeft = true;
@@ -204,6 +229,8 @@ public class GearBase : TargetObjectBase {
 
     protected virtual void DoubleClickDEvent()
     {
+        if (isRolling)
+            return;
         print("double click D " + Time.time);
         isRolling = true;
         isLeft = false;
@@ -225,5 +252,17 @@ public class GearBase : TargetObjectBase {
             count = 0;
             Tick.OnUpdate -= ChainRollUpdate;
         }
+    }
+
+    void MeshActionBySpeed(float speed)
+    {
+        float length = (speed - minSpeed) / (maxSpeed - minSpeed);
+        foreach(Material mat in FlameMats)
+        {
+            mat.SetFloat("_Speed", length);
+        }
+
+        wing_left.DOLocalRotate(Vector3.up * 20f * (1 - length), 0.2f);
+        wing_right.DOLocalRotate(Vector3.up * -20f * (1 - length), 0.2f);
     }
 }
